@@ -128,7 +128,18 @@ public class TezCounters extends AbstractCounters<TezCounter, CounterGroup> {
    * Default constructor
    */
   public TezCounters() {
-    super(groupFactory);
+    this(groupFactory);
+  }
+
+  /**
+   * Construct the Counters object from the another counters object
+   * @param <C> the type of counter
+   * @param <G> the type of counter group
+   * @param counters the old counters object
+   */
+  public <C extends TezCounter, G extends CounterGroupBase<C>> TezCounters(
+      CounterGroupFactory<TezCounter, CounterGroup> customGroupFactory) {
+    super(customGroupFactory);
   }
 
   /**

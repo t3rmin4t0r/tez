@@ -44,6 +44,7 @@ import javax.annotation.Nullable;
 
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.CodedOutputStream;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.classification.InterfaceAudience.Private;
@@ -63,6 +64,7 @@ import org.apache.tez.client.TezClientUtils;
 import org.apache.tez.common.ATSConstants;
 import org.apache.tez.common.ReflectionUtils;
 import org.apache.tez.common.TezUtilsInternal;
+import org.apache.tez.common.counters.AggregateTezCounters;
 import org.apache.tez.common.counters.LimitExceededException;
 import org.apache.tez.common.counters.TezCounters;
 import org.apache.tez.common.io.NonSyncByteArrayOutputStream;
@@ -3335,8 +3337,8 @@ public class VertexImpl implements org.apache.tez.dag.app.dag.Vertex, EventHandl
 
   @Private
   public void constructFinalFullcounters() {
-    this.fullCounters = new TezCounters();
-    this.fullCounters.incrAllCounters(counters);
+    this.fullCounters = new AggregateTezCounters();
+    this.fullCounters.aggrAllCounters(counters);
     this.vertexStats = new VertexStats();
 
     for (Task t : this.tasks.values()) {

@@ -230,7 +230,7 @@ public abstract class FileSystemCounterGroup<C extends TezCounter>
         instanceof FileSystemCounterGroup<?>) {
       for (TezCounter counter : other) {
         FSCounter c = (FSCounter) ((TezCounter)counter).getUnderlyingCounter();
-        findCounter(c.scheme, c.key) .increment(counter.getValue());
+        findCounter(c.scheme, c.key) .aggregate(counter);
       }
     }
   }
