@@ -4,24 +4,24 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class AggregateTezCounter<T extends TezCounter> extends AbstractCounter {
+public class AggregateTezCounterDelegate<T extends TezCounter> extends AbstractCounter implements AggregateTezCounter {
 
   private final T child;
   private long min = Long.MAX_VALUE;
   private long max = Long.MIN_VALUE;
 
-  public AggregateTezCounter(T child) {
+  public AggregateTezCounterDelegate(T child) {
     this.child = child;
   }
   
   @Override
   public String getName() {
-    return String.format("%s_aggregate", child.getName());
+    return child.getName(); // this is a pass-through
   }
 
   @Override
   public String getDisplayName() {
-    return String.format("Aggregate(%s)", child.getDisplayName());
+    return child.getDisplayName();
   }
 
   @Override
@@ -36,10 +36,13 @@ public class AggregateTezCounter<T extends TezCounter> extends AbstractCounter {
 
   @Override
   public void increment(long incr) {
-    throw new IllegalArgumentException("Cannot increment an aggregate counter");
+    throw new UnsupportedOperationException("Cannot increment an aggregate counter");
   }
   
-  @Override 
+  /* (non-Javadoc)
+   * @see org.apache.tez.common.counters.AggregateTezCounter#aggregate(org.apache.tez.common.counters.TezCounter)
+   */
+  @Override
   public synchronized void aggregate(TezCounter other) {
     final long val = other.getValue();
     this.child.increment(val);
@@ -58,19 +61,21 @@ public class AggregateTezCounter<T extends TezCounter> extends AbstractCounter {
 
   @Override
   public void readFields(DataInput arg0) throws IOException {
-    throw new IllegalArgumentException("Cannot deserialize an aggregate counter");
+    throw new UnsupportedOperationException("Cannot deserialize an aggregate counter");
   }
 
   @Override
   public void write(DataOutput arg0) throws IOException {
-    this.child.write(arg0);
+    throw new UnsupportedOperationException("Cannot deserialize an aggregate counter");
   }
 
-  public synchronized long getMin() {
+  @Override
+  public long getMin() {
     return min;
   }
-  
-  public synchronized long getMax() {
+
+  @Override
+  public long getMax() {
     return max;
   }
 }

@@ -18,7 +18,8 @@ public class AggregateTezCounters extends TezCounters {
 
     @Override
     protected FrameworkCounter<T> newCounter(T key) {
-      return new FrameworkCounter<T>(key, getName());
+      return (new AggregateFrameworkCounter<T>(key, getName()))
+          .asFrameworkCounter();
     }
 
     @Override
@@ -38,12 +39,12 @@ public class AggregateTezCounters extends TezCounters {
 
     @Override
     protected TezCounter newCounter(String name, String displayName, long value) {
-      return new AggregateTezCounter<GenericCounter>(new GenericCounter(name, displayName, value));
+      return new AggregateTezCounterDelegate<GenericCounter>(new GenericCounter(name, displayName, value));
     }
 
     @Override
     protected TezCounter newCounter() {
-      return new AggregateTezCounter<GenericCounter>(new GenericCounter());
+      return new AggregateTezCounterDelegate<GenericCounter>(new GenericCounter());
     }
 
     @Override
@@ -58,7 +59,7 @@ public class AggregateTezCounters extends TezCounters {
 
     @Override
     protected TezCounter newCounter(String scheme, FileSystemCounter key) {
-      return new AggregateTezCounter<FSCounter>(new FSCounter(scheme, key));
+      return new AggregateTezCounterDelegate<FSCounter>(new FSCounter(scheme, key));
     }
 
     @Override

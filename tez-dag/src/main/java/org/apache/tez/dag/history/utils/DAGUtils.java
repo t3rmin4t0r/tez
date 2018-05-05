@@ -35,6 +35,7 @@ import org.apache.tez.common.ATSConstants;
 import org.apache.tez.common.TezCommonUtils;
 import org.apache.tez.common.VersionInfo;
 import org.apache.tez.common.counters.AggregateTezCounter;
+import org.apache.tez.common.counters.AggregateTezCounterDelegate;
 import org.apache.tez.common.counters.CounterGroup;
 import org.apache.tez.common.counters.TezCounter;
 import org.apache.tez.common.counters.TezCounters;
@@ -154,7 +155,7 @@ public class DAGUtils {
                     counter.getDisplayName());
             }
             counterMap.put(ATSConstants.COUNTER_VALUE, counter.getValue());
-            if (counter instanceof AggregateTezCounter) {
+            if (counter instanceof AggregateTezCounterDelegate) {
               counterMap.put(ATSConstants.COUNTER_MAX_VALUE,
                     ((AggregateTezCounter)counter).getMax());
               counterMap.put(ATSConstants.COUNTER_MIN_VALUE,
