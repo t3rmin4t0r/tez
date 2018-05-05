@@ -21,14 +21,22 @@ public class AggregateFrameworkCounter<T extends Enum<T>> extends FrameworkCount
   @Override
   public void aggregate(TezCounter other) {
     final long val = other.getValue();
+    final long othermax;
+    final long othermin;
+    if (other instanceof AggregateTezCounter) {
+      othermax = ((AggregateTezCounter) other).getMax();
+      othermin = ((AggregateTezCounter) other).getMin();
+    } else {
+      othermin = othermax = val;
+    }
     super.increment(val);
-    if (min == Long.MAX_VALUE) {
-      this.min = this.max = val;
+    if (this.min == Long.MAX_VALUE) {
+      this.min = othermin;
+      this.max = othermax;
       return;
     }
-    // these are only called from the AM within a lock
-    this.min = Math.min(this.min, val);
-    this.max = Math.max(this.max, val);
+    this.min = Math.min(this.min, othermin);
+    this.max = Math.max(this.max, othermax);
   }
 
   @Override

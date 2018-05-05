@@ -43,15 +43,24 @@ public class AggregateTezCounterDelegate<T extends TezCounter> extends AbstractC
    * @see org.apache.tez.common.counters.AggregateTezCounter#aggregate(org.apache.tez.common.counters.TezCounter)
    */
   @Override
-  public synchronized void aggregate(TezCounter other) {
+  public void aggregate(TezCounter other) {
     final long val = other.getValue();
+    final long othermax;
+    final long othermin;
+    if (other instanceof AggregateTezCounter) {
+      othermax = ((AggregateTezCounter) other).getMax();
+      othermin = ((AggregateTezCounter) other).getMin();
+    } else {
+      othermin = othermax = val;
+    }
     this.child.increment(val);
     if (this.min == Long.MAX_VALUE) {
-      this.min = this.max = other.getValue();
+      this.min = othermin;
+      this.max = othermax;
       return;
     }
-    this.min = Math.min(this.min, val);
-    this.max = Math.max(this.max, val);
+    this.min = Math.min(this.min, othermin);
+    this.max = Math.max(this.max, othermax);
   }
 
   @Override
