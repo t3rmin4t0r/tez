@@ -4,13 +4,13 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class AggregateTezCounter extends AbstractCounter {
+public class AggregateTezCounter<T extends TezCounter> extends AbstractCounter {
 
-  private final TezCounter child;
+  private final T child;
   private long min = Long.MAX_VALUE;
   private long max = Long.MIN_VALUE;
 
-  public AggregateTezCounter(TezCounter child) {
+  public AggregateTezCounter(T child) {
     this.child = child;
   }
   
@@ -58,14 +58,12 @@ public class AggregateTezCounter extends AbstractCounter {
 
   @Override
   public void readFields(DataInput arg0) throws IOException {
-    // TODO Auto-generated method stub
-    
+    throw new IllegalArgumentException("Cannot deserialize an aggregate counter");
   }
 
   @Override
   public void write(DataOutput arg0) throws IOException {
-    // TODO Auto-generated method stub
-    
+    this.child.write(arg0);
   }
 
   public synchronized long getMin() {

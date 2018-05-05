@@ -107,6 +107,8 @@ public class ATSConstants {
   public static final String COUNTER_NAME = "counterName";
   public static final String COUNTER_DISPLAY_NAME = "counterDisplayName";
   public static final String COUNTER_VALUE = "counterValue";
+  public static final String COUNTER_MIN_VALUE = "counterMinValue";
+  public static final String COUNTER_MAX_VALUE = "counterMaxValue";
 
   /* Url related */
   public static final String RESOURCE_URI_BASE = "/ws/v1/timeline";

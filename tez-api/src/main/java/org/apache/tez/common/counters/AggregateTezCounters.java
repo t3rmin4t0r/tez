@@ -1,6 +1,5 @@
 package org.apache.tez.common.counters;
 
-
 public class AggregateTezCounters extends TezCounters {
   
   private static final GroupFactory groupFactory = new GroupFactory();
@@ -39,12 +38,12 @@ public class AggregateTezCounters extends TezCounters {
 
     @Override
     protected TezCounter newCounter(String name, String displayName, long value) {
-      return new GenericCounter(name, displayName, value);
+      return new AggregateTezCounter<GenericCounter>(new GenericCounter(name, displayName, value));
     }
 
     @Override
     protected TezCounter newCounter() {
-      return new GenericCounter();
+      return new AggregateTezCounter<GenericCounter>(new GenericCounter());
     }
 
     @Override
@@ -59,7 +58,7 @@ public class AggregateTezCounters extends TezCounters {
 
     @Override
     protected TezCounter newCounter(String scheme, FileSystemCounter key) {
-      return new FSCounter(scheme, key);
+      return new AggregateTezCounter<FSCounter>(new FSCounter(scheme, key));
     }
 
     @Override

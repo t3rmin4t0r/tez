@@ -64,6 +64,7 @@ import org.apache.hadoop.yarn.state.StateMachineFactory;
 import org.apache.hadoop.yarn.util.Clock;
 import org.apache.tez.common.ATSConstants;
 import org.apache.tez.common.ReflectionUtils;
+import org.apache.tez.common.counters.AggregateTezCounters;
 import org.apache.tez.common.counters.DAGCounter;
 import org.apache.tez.common.counters.TezCounters;
 import org.apache.tez.dag.api.DagTypeConverters;
@@ -1874,10 +1875,10 @@ public class DAGImpl implements org.apache.tez.dag.app.dag.DAG,
 
   @Private
   public void constructFinalFullcounters() {
-    this.fullCounters = new TezCounters();
-    this.fullCounters.incrAllCounters(dagCounters);
+    this.fullCounters = new AggregateTezCounters();
+    this.fullCounters.aggrAllCounters(dagCounters);
     for (Vertex v : this.vertices.values()) {
-      this.fullCounters.incrAllCounters(v.getAllCounters());
+      this.fullCounters.aggrAllCounters(v.getAllCounters());
     }
   }
 
