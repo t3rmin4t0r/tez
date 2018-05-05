@@ -155,7 +155,7 @@ public class DAGUtils {
                     counter.getDisplayName());
             }
             counterMap.put(ATSConstants.COUNTER_VALUE, counter.getValue());
-            if (counter instanceof AggregateTezCounterDelegate) {
+            if (counter instanceof AggregateTezCounter) {
               counterMap.put(ATSConstants.COUNTER_MAX_VALUE,
                     ((AggregateTezCounter)counter).getMax());
               counterMap.put(ATSConstants.COUNTER_MIN_VALUE,

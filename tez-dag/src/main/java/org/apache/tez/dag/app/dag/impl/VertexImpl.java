@@ -1199,8 +1199,8 @@ public class VertexImpl implements org.apache.tez.dag.app.dag.Vertex, EventHandl
       }
 
       TezCounters counters = new TezCounters();
-      counters.incrAllCounters(this.counters);
-      return incrTaskCounters(counters, tasks.values());
+      counters.aggrAllCounters(this.counters);
+      return aggrTaskCounters(counters, tasks.values());
 
     } finally {
       readLock.unlock();
@@ -1228,8 +1228,8 @@ public class VertexImpl implements org.apache.tez.dag.app.dag.Vertex, EventHandl
       }
 
       TezCounters counters = new TezCounters();
-      counters.incrAllCounters(this.counters);
-      cachedCounters = incrTaskCounters(counters, tasks.values());
+      counters.aggrAllCounters(this.counters);
+      cachedCounters = aggrTaskCounters(counters, tasks.values());
       return cachedCounters;
     } finally {
       readLock.unlock();
@@ -1238,7 +1238,7 @@ public class VertexImpl implements org.apache.tez.dag.app.dag.Vertex, EventHandl
 
   @Override
   public void addCounters(final TezCounters tezCounters) {
-    counters.incrAllCounters(tezCounters);
+    counters.aggrAllCounters(tezCounters);
   }
 
   @Override
@@ -1337,10 +1337,10 @@ public class VertexImpl implements org.apache.tez.dag.app.dag.Vertex, EventHandl
     return false;
   }
 
-  public static TezCounters incrTaskCounters(
+  public static TezCounters aggrTaskCounters(
       TezCounters counters, Collection<Task> tasks) {
     for (Task task : tasks) {
-      counters.incrAllCounters(task.getCounters());
+      counters.aggrAllCounters(task.getCounters());
     }
     return counters;
   }
@@ -2059,7 +2059,7 @@ public class VertexImpl implements org.apache.tez.dag.app.dag.Vertex, EventHandl
         || !recoveryData.isVertexSucceeded()) {
       logJobHistoryVertexCompletedHelper(VertexState.SUCCEEDED, finishTime,
           logSuccessDiagnostics ? StringUtils.join(getDiagnostics(), LINE_SEPARATOR) : "",
-          getAllCounters());
+          constructFinalFullcounters());
     }
   }
 
@@ -2068,7 +2068,7 @@ public class VertexImpl implements org.apache.tez.dag.app.dag.Vertex, EventHandl
         || !recoveryData.isVertexFinished()) {
       TezCounters counters = null;
       try {
-        counters = getAllCounters();
+        counters = constructFinalFullcounters();
       } catch (LimitExceededException e) {
         // Ignore as failed vertex
         addDiagnostic("Counters limit exceeded: " + e.getMessage());
@@ -3327,7 +3327,7 @@ public class VertexImpl implements org.apache.tez.dag.app.dag.Vertex, EventHandl
         // Already constructed. Just return.
         return;
       }
-      this.constructFinalFullcounters();
+      this.fullCounters = this.constructFinalFullcounters();
     }
   }
 
@@ -3336,16 +3336,17 @@ public class VertexImpl implements org.apache.tez.dag.app.dag.Vertex, EventHandl
   }
 
   @Private
-  public void constructFinalFullcounters() {
-    this.fullCounters = new AggregateTezCounters();
-    this.fullCounters.aggrAllCounters(counters);
+  public TezCounters constructFinalFullcounters() {
+    AggregateTezCounters aggregateTezCounters = new AggregateTezCounters();
+    aggregateTezCounters.aggrAllCounters(counters);
     this.vertexStats = new VertexStats();
 
     for (Task t : this.tasks.values()) {
       vertexStats.updateStats(t.getReport());
       TezCounters counters = t.getCounters();
-      this.fullCounters.aggrAllCounters(counters);
+      aggregateTezCounters.aggrAllCounters(counters);
     }
+    return aggregateTezCounters;
   }
 
   private static class RootInputInitFailedTransition implements
