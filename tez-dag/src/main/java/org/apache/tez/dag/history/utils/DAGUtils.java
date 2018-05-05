@@ -156,10 +156,13 @@ public class DAGUtils {
             }
             counterMap.put(ATSConstants.COUNTER_VALUE, counter.getValue());
             if (counter instanceof AggregateTezCounter) {
+              counterMap.put(ATSConstants.COUNTER_INSTANCE_COUNT, 
+                  ((AggregateTezCounter)counter).getCount());
               counterMap.put(ATSConstants.COUNTER_MAX_VALUE,
                     ((AggregateTezCounter)counter).getMax());
               counterMap.put(ATSConstants.COUNTER_MIN_VALUE,
                   ((AggregateTezCounter)counter).getMin());
+
             } 
             counterList.add(counterMap);
           }

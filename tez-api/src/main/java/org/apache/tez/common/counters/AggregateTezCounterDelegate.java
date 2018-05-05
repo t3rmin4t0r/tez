@@ -9,6 +9,7 @@ public class AggregateTezCounterDelegate<T extends TezCounter> extends AbstractC
   private final T child;
   private long min = Long.MAX_VALUE;
   private long max = Long.MIN_VALUE;
+  private long count = 0;
 
   public AggregateTezCounterDelegate(T child) {
     this.child = child;
@@ -47,12 +48,16 @@ public class AggregateTezCounterDelegate<T extends TezCounter> extends AbstractC
     final long val = other.getValue();
     final long othermax;
     final long othermin;
+    final long othercount;
     if (other instanceof AggregateTezCounter) {
       othermax = ((AggregateTezCounter) other).getMax();
       othermin = ((AggregateTezCounter) other).getMin();
+      othercount = ((AggregateTezCounter) other).getCount();
     } else {
       othermin = othermax = val;
+      othercount = 1;
     }
+    this.count += othercount;
     this.child.increment(val);
     if (this.min == Long.MAX_VALUE) {
       this.min = othermin;
@@ -86,5 +91,10 @@ public class AggregateTezCounterDelegate<T extends TezCounter> extends AbstractC
   @Override
   public long getMax() {
     return max;
+  }
+
+  @Override
+  public long getCount() {
+    return count;
   }
 }
